@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\TicketResource\Pages;
+use App\Filament\Resources\TicketResource\RelationManagers;
+use App\Models\Ticket;
+use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class TicketResource extends Resource
+{
+    protected static ?string $model = Ticket::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                TextInput::make('ticket_number')
+                    ->label('Ticket Number')
+                    ->required(),
+                DatePicker::make('ticket_date')
+                    ->label('Date')
+                    ->required(),       
+                TextInput::make('ticket_type')
+                    ->label('Ticket Type')
+                    ->required(),
+                Select::make('customer_id')
+                    ->label('Customer')
+                    ->relationship('customer', 'customer_name'),
+                Select::make('servicelocation_id')
+                    ->label('Service Location')
+                    ->relationship('serviceLocation', 'service_location_name'),
+                Select::make('location_id')
+                    ->label('Location')
+                    ->relationship('location', 'location_name'),
+                Textarea::make('problem_description')
+                    ->label('Problem Description')
+                    ->columnSpan(2),
+                Textarea::make('resolution_description')
+                    ->label('Resolution Description')
+                    ->columnSpan(2),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('ticket_number')
+                    ->label('Ticket Number')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('ticket_date')
+                    ->label('Date')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('ticket_type')
+                    ->label('Ticket Type')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('customer.customer_name')
+                    ->label('Customer')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('servicelocation.service_location_name')
+                    ->label('Service Location')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('location.location_name')
+                    ->label('Location')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('problem_description')
+                    ->label('Problem Description')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('resolution_description')
+                    ->label('Resolution Description')
+                    ->searchable()
+                    ->sortable(),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListTickets::route('/'),
+            'create' => Pages\CreateTicket::route('/create'),
+            'edit' => Pages\EditTicket::route('/{record}/edit'),
+        ];
+    }
+}

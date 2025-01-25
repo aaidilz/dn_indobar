@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid('customer_id')->nullable();
             $table->uuid('service_location_id')->nullable();
             $table->uuid('location_id')->nullable();
+            $table->string('ticket_number');
             $table->date('ticket_date');
             $table->string('ticket_type');
             $table->string('problem_description')->nullable();

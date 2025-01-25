@@ -19,6 +19,7 @@ class Ticket extends Model
         'customer_id',
         'service_location_id',
         'location_id',
+        'ticket_number',
         'ticket_date',
         'ticket_type',
         'problem_description',
