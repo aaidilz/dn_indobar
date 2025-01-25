@@ -33,19 +33,49 @@ class TicketResource extends Resource
                     ->required(),
                 DatePicker::make('ticket_date')
                     ->label('Date')
-                    ->required(),       
+                    ->required(),
                 TextInput::make('ticket_type')
                     ->label('Ticket Type')
                     ->required(),
                 Select::make('customer_id')
                     ->label('Customer')
-                    ->relationship('customer', 'customer_name'),
-                Select::make('servicelocation_id')
+                    ->relationship('customer', 'customer_name')
+                    ->createOptionForm([
+                        TextInput::make('customer_name')
+                            ->label('Customer Name')
+                            ->required(),
+                        TextInput::make('customer_serial_number')
+                            ->label('Serial Number')
+                            ->required(),
+                        TextInput::make('customer_uid')
+                            ->label('Customer UID')
+                            ->required(),
+                    ]),
+                Select::make('service_location_id')
                     ->label('Service Location')
-                    ->relationship('serviceLocation', 'service_location_name'),
+                    ->relationship('serviceLocation', 'service_location_name')
+                    ->createOptionForm([
+                        TextInput::make('service_location_name')
+                            ->label('Service Location Name')
+                            ->required()
+                    ]),
                 Select::make('location_id')
                     ->label('Location')
-                    ->relationship('location', 'location_name'),
+                    ->relationship('location', 'location_name')
+                    ->createOptionForm([
+                        TextInput::make('location_name')
+                            ->label('Location Name')
+                            ->required(),
+                        TextInput::make('city')
+                            ->label('City')
+                            ->required(),
+                        TextInput::make('province')
+                            ->label('Province')
+                            ->required(),
+                        TextInput::make('district')
+                            ->label('District')
+                            ->required(),
+                    ])  ,
                 Textarea::make('problem_description')
                     ->label('Problem Description')
                     ->columnSpan(2),
