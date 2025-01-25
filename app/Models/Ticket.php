@@ -43,7 +43,8 @@ class Ticket extends Model
 
     public function remarks()
     {
-        return $this->hasMany(TicketRemark::class, 'ticket_id', 'ticket_id');
+        return $this->hasOne(TicketRemark::class, 'ticket_id', 'ticket_id')
+                    ->latest('created_at'); 
     }
 
     public function parts()

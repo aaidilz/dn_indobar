@@ -12,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Pages\Page;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -20,6 +21,9 @@ use Filament\Tables\Table;
 use Guava\FilamentModalRelationManagers\Actions\Table\RelationManagerAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Response;
+use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class TicketResource extends Resource
 {
@@ -116,11 +120,11 @@ class TicketResource extends Resource
                     ->label('Location')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('problem_description')
+                TextColumn::make('remarks.remark_status')
                     ->label('Problem Description')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('resolution_description')
+                TextColumn::make('remarks.remark_description')
                     ->label('Resolution Description')
                     ->searchable()
                     ->sortable(),
@@ -138,10 +142,11 @@ class TicketResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make()->label('Export to Excel')
                 ]),
             ]);
     }
-
+    
     public static function getRelations(): array
     {
         return [
