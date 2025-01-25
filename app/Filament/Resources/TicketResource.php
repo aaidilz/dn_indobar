@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\TicketRemarkResource\RelationManagers\TicketRemarkRelationManager;
 use App\Filament\Resources\TicketResource\Pages;
 use App\Filament\Resources\TicketResource\RelationManagers;
 use App\Models\Ticket;
@@ -11,10 +12,12 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Guava\FilamentModalRelationManagers\Actions\Table\RelationManagerAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -75,7 +78,7 @@ class TicketResource extends Resource
                         TextInput::make('district')
                             ->label('District')
                             ->required(),
-                    ])  ,
+                    ]),
                 Textarea::make('problem_description')
                     ->label('Problem Description')
                     ->columnSpan(2),
@@ -126,7 +129,11 @@ class TicketResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                RelationManagerAction::make('remarks')
+                    ->label('Remarks') // This will be shown when clicked or for accessibility
+                    ->tooltip(fn($record) => "Remarks for Ticket: {$record->ticket_number}") // Tooltip for context
+                    ->relationManager(TicketRemarkRelationManager::class),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -138,7 +145,7 @@ class TicketResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            TicketRemarkRelationManager::class,
         ];
     }
 

@@ -20,6 +20,7 @@ class ServiceLocationResource extends Resource
     protected static ?string $model = ServiceLocation::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'DB';
 
     public static function form(Form $form): Form
     {
