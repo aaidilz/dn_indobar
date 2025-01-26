@@ -42,6 +42,7 @@ class TicketResource extends Resource
             ->schema([
                 TextInput::make('ticket_number')
                     ->label('Ticket Number')
+                    ->unique(ignoreRecord: true)
                     ->required(),
                 DatePicker::make('ticket_date')
                     ->label('Date')
