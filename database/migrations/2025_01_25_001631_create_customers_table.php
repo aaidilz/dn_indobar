@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->uuid('customer_id')->primary();
             $table->string('customer_name');
-            $table->string('customer_serial_number');
-            $table->string('customer_uid');
+            $table->string('customer_serial_number')->nullable();
+            $table->string('customer_uid')->nullable();
             $table->timestamps();
         });
     }
