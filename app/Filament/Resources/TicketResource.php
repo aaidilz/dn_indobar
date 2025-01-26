@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TicketRemarkResource\RelationManagers\TicketRemarkRelationManager;
 use App\Filament\Resources\TicketResource\Pages;
 use App\Filament\Resources\TicketResource\RelationManagers;
+use App\Models\Customer;
 use App\Models\Ticket;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
@@ -17,6 +18,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Guava\FilamentModalRelationManagers\Actions\Table\RelationManagerAction;
 use Illuminate\Database\Eloquent\Builder;
@@ -130,7 +132,50 @@ class TicketResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+                Filter::make('ticket_type')
+                    ->label('Ticket Type')
+                    ->form([
+                        Select::make('ticket_type')
+                            ->placeholder('Any')
+                            ->options(
+                                Ticket::query()
+                                    ->select('ticket_type')
+                                    ->distinct()
+                                    ->get()
+                                    ->pluck('ticket_type', 'ticket_type') // Menggunakan key-value array
+                                    ->toArray() // Konversi ke array
+                            ),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!empty($data['ticket_type'])) {
+                            $query->where('ticket_type', $data['ticket_type']);
+                        }
+                        return $query;
+                    }),
+                    
+                    Filter::make('customer_name')
+                    ->label('Customer Name')
+                    ->form([
+                        Select::make('customer_name')
+                            ->placeholder('Any')
+                            ->options(
+                                Customer::query()
+                                    ->select('customer_id', 'customer_name')
+                                    ->distinct()
+                                    ->get()
+                                    ->pluck('customer_name', 'customer_id')
+                                    ->toArray()
+                            ),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!empty($data['customer_name'])) {
+                            $query->whereHas('customer', function (Builder $customerQuery) use ($data) {
+                                $customerQuery->where('customer_id', $data['customer_name']);
+                            });
+                        }
+                        return $query;
+                    }),
+                
             ])
             ->actions([
                 RelationManagerAction::make('remarks')
@@ -146,7 +191,7 @@ class TicketResource extends Resource
                 ]),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [

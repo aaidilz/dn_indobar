@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\ServiceLocation;
 use App\Models\Location;
 use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -18,15 +19,22 @@ class ImportTicket implements ToModel, WithHeadingRow
     $ticket = Ticket::firstOrCreate(
         ['ticket_number' => trim($row['ticket_number'])], // Kondisi pencarian
         [ // Data baru jika tidak ditemukan
-            'ticket_date' => $row['ticket_date'],
+            'ticket_date' => $this->calculateTicketDate($row['ticket_date']),
             'ticket_type' => $row['ticket_type'],
             'customer_id' => $this->createOrGetCustomer($row['customer_name']),
             'service_location_id' => $this->createOrGetServiceLocation($row['service_location_name']),
             'location_id' => $this->createOrGetLocation($row['location_name']),
         ]
     );
-
     return $ticket;
+}
+
+private function calculateTicketDate(string $ticketDate)
+{
+    $unixDate = ($ticketDate - 25569) * 86400;
+    $reformattedDate = Carbon::createFromTimestamp($unixDate)->format('Y-m-d');
+
+    return $reformattedDate;
 }
 
 private function createOrGetCustomer(string $customerName)
