@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TicketRemarkResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -28,8 +29,19 @@ class TicketRemarkRelationManager extends RelationManager
                DatePicker::make('remark_date')
                     ->label('Remark Date')
                     ->required(),
-                TextInput::make('remark_status')
-                    ->label('Remark Status')
+                    Select::make('remark_status')
+                    ->label('Status')
+                    ->options([
+                        'CANCEL' => 'CANCEL',
+                        'CLOSED' => 'CLOSED',
+                        'DOUBLE TICKET' => 'DOUBLE TICKET',
+                        'PENDING SPK' => 'PENDING SPK',
+                        'WAITING VISIT' => 'WAITING VISIT',
+                        'PENDING CUSTOMER' => 'PENDING CUSTOMER',
+                        'PENDING PARTS' => 'PENDING PARTS',
+                        'PENDING KOTA TERUSAN' => 'PENDING KOTA TERUSAN',
+                        'PENDING ANALUSA TS' => 'PENDING ANALUSA TS',
+                    ])
                     ->required(),
                 Textarea::make('remark_description')
                     ->label('Remark Description')

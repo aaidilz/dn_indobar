@@ -35,8 +35,16 @@ class TicketRemarkResource extends Resource
                 DatePicker::make('remark_date')
                     ->label('Date')
                     ->required(),
-                TextInput::make('remark_status')
+                Select::make('remark_status')
                     ->label('Status')
+                    ->options([
+                        'CANCEL' => 'CANCEL',
+                        'CLOSED' => 'CLOSED',
+                        'DOUBLE TICKET' => 'DOUBLE TICKET',
+                        'PENDING SPK' => 'PENDING SPK',
+                        'WAITING VISIT' => 'WAITING VISIT',
+
+                    ])
                     ->required(),
                 TextInput::make('remark_description')
                     ->label('Description')
