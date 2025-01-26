@@ -43,7 +43,6 @@ class TicketRemarkResource extends Resource
                         'DOUBLE TICKET' => 'DOUBLE TICKET',
                         'PENDING SPK' => 'PENDING SPK',
                         'WAITING VISIT' => 'WAITING VISIT',
-
                     ])
                     ->required(),
                 TextInput::make('remark_description')
