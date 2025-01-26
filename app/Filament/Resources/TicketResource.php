@@ -6,7 +6,10 @@ use App\Filament\Resources\TicketRemarkResource\RelationManagers\TicketRemarkRel
 use App\Filament\Resources\TicketResource\Pages;
 use App\Filament\Resources\TicketResource\RelationManagers;
 use App\Models\Customer;
+use App\Models\Location;
+use App\Models\ServiceLocation;
 use App\Models\Ticket;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -123,13 +126,39 @@ class TicketResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('remarks.remark_status')
-                    ->label('Problem Description')
+                    ->label('Status')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('remarks.remark_date')
+                    ->label('Remark Date')
+                    ->searchable(),
                 TextColumn::make('remarks.remark_description')
-                    ->label('Resolution Description')
-                    ->searchable()
+                    ->label('Remark')
+                    ->limit(50)
                     ->sortable(),
+                TextColumn::make('aging')
+                    ->label('Aging')
+                    ->getStateUsing(function ($record) {
+                        // Periksa apakah remarks ada
+                        $remarkDate = optional($record->remarks)->remark_date;
+                        $ticketDate = $record->ticket_date;
+                    
+                        // Jika salah satu tanggal tidak ada, kembalikan 'N/A'
+                        if (!$remarkDate || !$ticketDate) {
+                            return;
+                        }
+                    
+                        // Hitung selisih hari menggunakan Carbon
+                        $aging = abs(Carbon::parse($ticketDate)->diffInDays($remarkDate));
+
+                        // remove negative value
+                        
+                    
+                        return $aging . ' days';
+                    })
+                    
+                    ->sortable(),
+
             ])
             ->filters([
                 Filter::make('ticket_type')
@@ -152,8 +181,8 @@ class TicketResource extends Resource
                         }
                         return $query;
                     }),
-                    
-                    Filter::make('customer_name')
+
+                Filter::make('customer_name')
                     ->label('Customer Name')
                     ->form([
                         Select::make('customer_name')
@@ -175,11 +204,57 @@ class TicketResource extends Resource
                         }
                         return $query;
                     }),
-                
+                    Filter::make('location_name')
+                    ->label('Location Name')
+                    ->form([
+                        Select::make('location_name')
+                            ->placeholder('Any')
+                            ->options(
+                                Location::query()
+                                    ->select('location_id', 'location_name')
+                                    ->distinct()
+                                    ->get()
+                                    ->pluck('location_name', 'location_id')
+                                    ->toArray()
+                            ),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!empty($data['location_name'])) {
+                            $query->whereHas('location', function (Builder $locationQuery) use ($data) {
+                                $locationQuery->where('location_id', $data['location_name']);
+                            });
+                        }
+                        return $query;
+                    }),
+
+                    Filter::make('service_location_name')
+                    ->label('Service Location Name')
+                    ->form([
+                        Select::make('service_location_name')
+                            ->placeholder('Any')
+                            ->options(
+                                ServiceLocation::query()
+                                    ->select('service_location_id', 'service_location_name')
+                                    ->distinct()
+                                    ->get()
+                                    ->pluck('service_location_name', 'service_location_id')
+                                    ->toArray()
+                            ),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!empty($data['service_location_name'])) {
+                            $query->whereHas('serviceLocation', function (Builder $serviceLocationQuery) use ($data) {
+                                $serviceLocationQuery->where('service_location_id', $data['service_location_name']);
+                            });
+                        }
+                        return $query;
+                    }),
+
+
             ])
             ->actions([
                 RelationManagerAction::make('remarks')
-                    ->label('Remarks') // This will be shown when clicked or for accessibility
+                    ->label('edit remark') // This will be shown when clicked or for accessibility
                     ->tooltip(fn($record) => "Remarks for Ticket: {$record->ticket_number}") // Tooltip for context
                     ->relationManager(TicketRemarkRelationManager::class),
                 // Tables\Actions\EditAction::make(),
