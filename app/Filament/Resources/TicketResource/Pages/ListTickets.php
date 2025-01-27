@@ -30,7 +30,17 @@ class ListTickets extends ListRecords
                             Column::make('serviceLocation.service_location_name')->heading('service_location_name'),
                             Column::make('location.location_name')->heading('location_name'),
                             Column::make('remarks.remark_status')->heading('remark_status'),
-                            Column::make('remarks.remark_description')->heading('remark_description'),
+                            Column::make('remarks.remark_description')->heading('Remark Description')
+                            ->formatStateUsing(function ($record) {
+                                // Ambil semua remarks dari relasi
+                                $remarks = $record->remarks()->get(); // Pastikan ini menjadi koleksi
+                        
+                                // Format setiap remark menjadi string
+                                return $remarks->map(function ($remark) {
+                                    return "date:{$remark->remark_date} : status:{$remark->remark_status} : description:{$remark->remark_description}";
+                                })->join(' // '); // Gabungkan semua remark dengan `//`
+                            }),
+                        
                         ]),
                 ]),
 
