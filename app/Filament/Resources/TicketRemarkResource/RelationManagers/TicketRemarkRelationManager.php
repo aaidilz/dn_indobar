@@ -72,6 +72,9 @@ class TicketRemarkRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                ->visible(function () {
+                    return !$this->getRelationship()->where('remark_status', 'CLOSED')->exists();
+                }),
             // ->actions([
             //     Tables\Actions\EditAction::make(),
             //     Tables\Actions\DeleteAction::make(),
